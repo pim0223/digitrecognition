@@ -1,17 +1,18 @@
+#Returns a vector with amount of ink for each row.
 densityFunc <- function(table){
-table <- mnist  
   
 amountOfInk <- vector()
-
-for(row in 2:1000)
+i = 0
+for(row in 1:42000)
 {
-  print(table[row,col])
+  i = i + 1
   ink = 0
   for(col in 2:785)
   {
-    ink = ink + table[row,col]
+    ink = ink + as.numeric(table[row,col])
   }
-  amountOfInk[row] <- ink
+  
+  amountOfInk[i] <- ink
 }
 
 return(amountOfInk)
