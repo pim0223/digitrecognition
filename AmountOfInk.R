@@ -1,22 +1,30 @@
-#Returns a vector with amount of ink for each row.
-#input: table, amount of observations and amount of pixels.
-amountOfInk<- function(table, nobs, nvars){
-  
-amountOfInk <- vector() #the returnvector with amount of ink
-i = 0 #index of vector
-for(row in 1:nobs)
+calculateFeatures <- function()
 {
-  i = i + 1
-  ink = 0
-  for(col in 2:nvars)
-  {
-    ink = ink + as.numeric(table[row,col])
-  }
-  
-  amountOfInk[i] <- ink
+  mnist$AOI <- amountOfInk(mnist, 42000, 784)
+  mnist$scaledAOI <- scale(mnist$AOI)
+  mnist$horPass <- horizontalPasses(mnist, 42000, 784)  
+  mnist$verPass <- verticalPasses(mnist, 42000, 784)
 }
 
-return(amountOfInk)
+#Returns a vector with amount of ink for each row.
+#input: table, amount of observations and amount of pixels.
+amountOfInk<- function(table, nobs, nvars)
+{
+  amountOfInk <- vector() #the returnvector with amount of ink
+  i = 0 #index of vector
+  for(row in 1:nobs)
+  {
+    i = i + 1
+    ink = 0
+    for(col in 2:nvars)
+    {
+      ink = ink + as.numeric(table[row,col])
+    }
+    
+    amountOfInk[i] <- ink
+  }
+  
+  return(amountOfInk)
 }
 
 #return number of horizontal passes
@@ -69,27 +77,29 @@ verticalPasses <- function(table, nobs, nvars)
   return(verticalPasses);
 }
 
-makeAOImultinom <- function(data)
-{
-  data.AOImultinom <- multinom(label ~ AOI, data)
-  return(data.AOImultinom)
-}
 
-#make a multinom of scaled density to label given data.
-makeScaledAOImultinom <- function(data)
-{
-  data.ScaledAOImultinom <- multinom(label ~ scaledAOI, data)
-  return(data.ScaledAOImultinom)
-}
+#multinoms and prediction (done over whole dataset)
+AOI.multinom <- multinom(label ~ AOI, mnist)
+AOI.multinom.pred <- predict(AOI.multinom, mnist[,-c(1)])
+AOI.multinom.table <- table(mnist[,1], AOI.multinom.pred)
 
-makeHorPassmultinom <- function(data)
-{
-  data.HorPassmultinom <- multinom(label ~ horPass, data)
-  return(data.HorPassmultinom)
-}
+ScaledAOI.multinom <- multinom(label ~ scaledAOI, mnist)
+ScaledAOI.multinom.pred <- predict(ScaledAOI.multinom, mnist[,-c(1)])
+ScaledAOI.multinom.table <- table(mnist[,1], ScaledAOI.multinom.pred)
 
-#make a prediction of data given a multinom function and data.
-predict <- function(multinom, data){
-  data.pred <- predict(multinom, data[,-c(1)])
-  return(data.pred)
-}
+HorPass.multinom <- multinom(label ~ HorPass, mnist)
+HorPass.multinom.pred <- predict(HorPass.multinom, mnist[,-c(1)])
+HorPass.multinom.table <- table(mnist[,1], HorPass.multinom.pred)
+
+VerPass.multinom <- multinom(label ~ VerPass, mnist)
+VerPass.multinom.pred <- predict(VerPass.multinom, mnist[,-c(1)])
+VerPass.multinom.table <- table(mnist[,1], VerPass.multinom.pred)
+
+Passes.multinom <- multinom(label ~ HorPass * VerPass, mnist)
+Passes.multinom.pred <- predict(Passes.multinom, mnist[,-c(1)])
+Passes.multinom.table <- table(mnist[,1], Passes.multinom.pred)
+
+PassAOI.multinom <- multinom(label ~ HorPass * VerPass * scaledAOI, mnist)
+PassAOI.multinom.pred <- predict(PassAOI.multinom, mnist[,-c(1)])
+PassAOI.multinom.table <- table(mnist[,1], PassAOI.multinom.pred)
+
