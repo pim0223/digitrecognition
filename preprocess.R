@@ -1,4 +1,6 @@
-setwd("C:/Users/DELL/uni/pr/digitrecognition")
+#setwd("C:/Users/DELL/uni/pr/digitrecognition")
+
+library(nnet)
 
 # Load in data
 if(!exists("mnist")){
