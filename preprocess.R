@@ -5,6 +5,11 @@ if(!exists("mnist")){
   mnist   = read.csv("mnist.csv")
 }
 
+samplerows <- sample(nrow(mnist), 1000)
+train <- mnist[samplerows,]
+test <- mnist[-samplerows,]
+
+
 labels  = mnist[,1]
 mnist28 = mnist[,-1]
 
