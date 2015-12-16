@@ -7,6 +7,8 @@ if(!exists("mnist")){
   mnist   = read.csv("mnist.csv")
 }
 
+mnist$label <- as.factor(mnist$label)
+
 samplerows <- sample(nrow(mnist), 1000)
 train <- mnist[samplerows,]
 test <- mnist[-samplerows,]
