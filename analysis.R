@@ -68,15 +68,47 @@ proc.time() - time1
 
 #svm preprocess. Take out columns with 0's.
 #pixels only
-svm.train <- train[,c(1:785)]
-svm.train <- svm.train[, c(1, colSums(train[,2:785]) != 0)]
+indexVector <- vector()
+for(i in 2:785)
+{
+  if(sum(train[,i]) != 0)
+    indexVector <- c(indexVector, i)
+}
+
+indexVector <- c(indexVector, 1)
+
+svm.train <- train[,c(indexVector)]
+
+#passes only
+indexVector <- vector()
+for(i in 790:845)
+{
+  if(sum(train[,i]) != 0)
+    indexVector <- c(indexVector, i)
+}
+
+indexVector <- c(indexVector, 1)
+
+svm.train <- train[,c(indexVector)]
 
 #pixels and passes
-svm.train <- train[,c(1:785,790:845)]
-svm.train <- svm.train[, c(1,colSums(svm.train[,2:841]) != 0)]
+indexVector <- vector()
+for(i in 2:785)
+{
+  if(sum(train[,i]) != 0)
+    indexVector <- c(indexVector, i)
+}
+for(i in 790:845)
+{
+  if(sum(train[,i]) != 0)
+    indexVector <- c(indexVector, i)
+}
 
-#svm.cv <- svm(label ~ ., data = train[,c(1,791:817,819:844)], cross = 10) #left out rows with always 0
-svm.cv <- svm(label ~ ., data = svm.train, cross = 10, gamma = 0.5, cost = 100) #left out rows with always 0
+indexVector <- c(indexVector, 1)
+
+svm.train <- train[,c(indexVector)]
+
+svm.cv <- svm(label ~ ., data = svm.train, cross = 10, gamma=2^(-10), cost =1) #left out rows with always 0
 svm.pred <- predict(svm.cv, test[,-1])
 svm.confmat <- table(test[,1], svm.pred)
 svm.accuracy <- vector(length = 10)
@@ -84,10 +116,11 @@ for(i in 1:10)
 {
   svm.accuracy[i] = svm.confmat[i,i] / sum(svm.confmat[i,])
 }
+svm.predictionRate<-sum(diag(svm.confmat))/sum(svm.confmat)
 print(svm.accuracy)
-print(sum(diag(svm.confmat))/sum(svm.confmat))
+print(svm.predictionRate)
 
 #with tuning
-svm.tuning <- tune.svm(label ~ ., data = svm.train, cross = 10, gamma = 2^(10), cost = 2^(10))
+svm.tuning <- tune.svm(label ~ ., data = svm.train, cross = 10, gamma = 2^(-10:-6), cost = 2^(0:4))
 
 
