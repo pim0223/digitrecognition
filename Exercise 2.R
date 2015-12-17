@@ -114,16 +114,28 @@ predictions <- function()
   verPass.multinom.pred <- predict(verPass.multinom, mnist[,-c(1)])
   verPass.multinom.table <- table(mnist[,1], verPass.multinom.pred)
   
-  Passes.multinom <- multinom(label ~ horPass * verPass, mnist)
+  Passes.multinom <- multinom(label ~ horPass + verPass, mnist)
   Passes.multinom.pred <- predict(Passes.multinom, mnist[,-c(1)])
   Passes.multinom.table <- table(mnist[,1], Passes.multinom.pred)
   
-  PassAOI.multinom <- multinom(label ~ horPass * verPass * scaledAOI, mnist, maxit=1000)
+  PassAOI.multinom <- multinom(label ~ horPass + verPass + scaledAOI, mnist, maxit=1000)
   PassAOI.multinom.pred <- predict(PassAOI.multinom, mnist[,-c(1)])
   PassAOI.multinom.table <- table(mnist[,1], PassAOI.multinom.pred)
   
   passPerRow.multinom <- multinom(label ~ ., mnist[,c(1,790:845)], maxit = 1000)
   passPerRow.multinom.pred <- predict(passPerRow.multinom, mnist[,-c(1)])
   passPerRow.multinom.table <- table(mnist[,1], passPerRow.multinom.pred)
+}
+
+tableCalculations <- function(table)
+{
+  table <- rbind(table, -1)
+  table <- cbind(table, -1)
+  for(i in 1:10)
+  {
+    table[11,i] = round((table[i,i] / sum(table[,i])) * 100, 1)
+    table[i,11] = round((table[i,i] / sum(table[i,])) * 100, 1)
+  }
+  return(table)
 }
 
