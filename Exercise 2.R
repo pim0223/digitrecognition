@@ -84,7 +84,7 @@ verticalPasses <- function(table, nobs, nvars)
       verticalPasses[ob, x] <- pass;
     }
   }
-  return(as.data.fram(verticalPasses));
+  return(as.data.frame(verticalPasses));
 }
 
 #calculates amount of vertical passes.
@@ -121,5 +121,9 @@ predictions <- function()
   PassAOI.multinom <- multinom(label ~ horPass * verPass * scaledAOI, mnist, maxit=1000)
   PassAOI.multinom.pred <- predict(PassAOI.multinom, mnist[,-c(1)])
   PassAOI.multinom.table <- table(mnist[,1], PassAOI.multinom.pred)
+  
+  passPerRow.multinom <- multinom(label ~ ., mnist[,c(1,790:845)], maxit = 1000)
+  passPerRow.multinom.pred <- predict(passPerRow.multinom, mnist[,-c(1)])
+  passPerRow.multinom.table <- table(mnist[,1], passPerRow.multinom.pred)
 }
 
