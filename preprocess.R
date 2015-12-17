@@ -7,6 +7,16 @@ if(!exists("mnist")){
   mnist   = read.csv("mnist.csv")
 }
 
+#Column numbers mnist
+#1       = label
+#2:785   = pixel-values
+#786     = AOI
+#787     = scaledAOI
+#788     = number of horizontal passes
+#789     = number of vertical passes
+#790:819 = horizontal passes per row
+#820:845 = vertical passes per row
+
 mnist$label <- as.factor(mnist$label)
 
 samplerows <- sample(nrow(mnist), 1000)
