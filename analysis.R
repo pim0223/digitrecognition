@@ -43,20 +43,22 @@ print(sum(diag(lasso.confmat))/sum(lasso.confmat))
 proc.time() - time1
 
 # KNN
+
 for(i in 1:10){
   knn.cv1 <- knn.cv(train[,c((2:785),787)], train[,1], k = i)
-  knn.confmat <- table(train[,1], knn.cv1)
-  print(sum(diag(knn.confmat))/sum(knn.confmat))
+  knn.train.confmat <- table(train[,1], knn.cv1)
+  print(sum(diag(knn.train.confmat))/sum(knn.train.confmat))
 }
 
+time1 = proc.time()
 knn.pred <- knn(train, test, train[,1], k = 1)
-lasso.confmat <- table(test[,1], lasso.pred)
-lasso.accuracy = vector(length = 10)
+knn.confmat <- table(test[,1], knn.pred)
+knn.accuracy = vector(length = 10)
 for(i in 1:10){
-  lasso.accuracy[i] = lasso.confmat[i,i] / sum(lasso.confmat[i,])
+  knn.accuracy[i] = knn.confmat[i,i] / sum(knn.confmat[i,])
 }
-print(lasso.accuracy)
-print(sum(diag(lasso.confmat))/sum(lasso.confmat))
+print(knn.accuracy)
+print(sum(diag(knn.confmat))/sum(knn.confmat))
 proc.time() - time1
 
 
