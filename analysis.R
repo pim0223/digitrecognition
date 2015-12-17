@@ -69,15 +69,15 @@ proc.time() - time1
 #svm preprocess. Take out columns with 0's.
 #pixels only
 svm.train <- train[,c(1:785)]
-svm.train <- svm.train[, c(1,colSums(svm.train[,2:785]) != 0)]
+svm.train <- svm.train[, c(1, colSums(train[,2:785]) != 0)]
 
 #pixels and passes
 svm.train <- train[,c(1:785,790:845)]
 svm.train <- svm.train[, c(1,colSums(svm.train[,2:841]) != 0)]
 
 #svm.cv <- svm(label ~ ., data = train[,c(1,791:817,819:844)], cross = 10) #left out rows with always 0
-svm.cv <- svm(label ~ ., data = svm.train, cross = 10, gamma = 0.5, cost = 4) #left out rows with always 0
-svm.pred <- predict(svm.model, test[,-1])
+svm.cv <- svm(label ~ ., data = svm.train, cross = 10, gamma = 0.5, cost = 100) #left out rows with always 0
+svm.pred <- predict(svm.cv, test[,-1])
 svm.confmat <- table(test[,1], svm.pred)
 svm.accuracy <- vector(length = 10)
 for(i in 1:10)
@@ -88,6 +88,6 @@ print(svm.accuracy)
 print(sum(diag(svm.confmat))/sum(svm.confmat))
 
 #with tuning
-svm.tuned <- tune.svm(label ~ ., data = svm.train, cross = 10, gamma = 2^(-1:1), cost = 2^(2:4))
-svm.tuned.pred <-predict(svm.tuned, test[,-1])
+svm.tuning <- tune.svm(label ~ ., data = svm.train, cross = 10, gamma = 2^(10), cost = 2^(10))
+
 
