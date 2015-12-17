@@ -13,25 +13,71 @@ if(!exists("mnist")){
   test <- mnist[-samplerows,]
 }
 
+
+
+reducedf = function(df, g){
+  df = df[,-1]
+  # Inputs are data-frame and desired granularity
+  # Flatten (horizontally)
+  for(i in 1:(784/g)){
+    new_col = matrix(rep(0, 42000), nrow = 42000)
+    for(j in 1:g){
+      new_col = new_col + df[,(i-1)*g + j]
+    }
+    df[,i] = new_col
+  }
+  
+  # Flatten (vertically)
+  for(i in 1:(784/g^2)){
+    new_col = matrix(rep(0, 42000), nrow = 42000)
+    for(j in 1:g){
+      new_col = new_col + df[,i + (i%/%28)*28 + (j-1)*28]
+    }
+    df[,i] = new_col 
+  }
+  
+  df = df[,1:(784/g^2)]
+  df[,i] = df[,i]/g^2
+  
+  df = cbind(label = mnist[,1], df)
+  return(df)
+}
+
+# mnist49 = reducedf(mnist, 4)
+# samplerows <- sample(nrow(mnist49), 1000)
+# train <- mnist49[samplerows,]
+# test <- mnist49[-samplerows,]
+
+
 # LASSO
 # lasso <- glmnet(as.matrix(train[,-1]), train[,1], family="multinomial")
 # lasso.pred <- predict(lasso, as.matrix(test[,-1]), type="class")
-lasso.cv <- cv.glmnet(as.matrix(train[,-1]), train[,1], family="multinomial", type.measure="class")
+# lasso.cv <- cv.glmnet(x = as.matrix(train[,-1]), y = train[,1], family="multinomial", type.measure="class")
 # plot(lasso.cv)
-lasso.cv.pred <- predict(lasso.cv, as.matrix(test[,-1]), type="class")
+# lasso.cv.pred <- predict(lasso.cv, as.matrix(test[,-1]), type="class")
+# CalculateAccuracy(lasso.cv.pred)
 
-# KNN
-knn.pred <- knn(train, test, train[,1], k = 1)
-# knn.cv <- knn.cv(train[-1], train[,1], k = 1)
-# knn.cv.pred <- predict(knn.cv, as.matrix(test[,-1]), type="class")
-
-# Calculate accuracy of prediction, using confusion matrix
-CalculateAccuracy <- function(pred){
-  confmat <- table(test[,1], pred)
-  paste("Accurracy of ", deparse(substitute(pred)),":", sum(diag(confmat))/sum(confmat))
+for(i in 1:5){
+  # In sample (determining k)
+  knn.cv = knn.cv(train[-1], train[,1], k = i)
+  confmat = table(train[,1], knn.cv)
+  pred.train = sum(diag(confmat))/sum(confmat)
+  
+  # Out of sample
+#   knn.pred = knn(train, test, train[,1], k = i)
+#   confmat2 = table(test[,1], knn.pred)
+#   pred.test = sum(diag(confmat2))/sum(confmat2)
+  
+  msg = paste("Prediction in sample: ", toString(pred.train))
+          # "Prediction out of sample: ", toString(pred.test))
+  
+  print(msg)
 }
 
-# CalculateAccuracy(lasso.pred)
-CalculateAccuracy(lasso.cv.pred)
-CalculateAccuracy(knn.pred)
-# CalculateAccuracy(knn.cv.pred)
+
+
+# # Calculate accuracy of prediction, using confusion matrix
+# CalculateAccuracy <- function(pred){
+#   confmat <- table(test[,1], pred)
+#   print(sum(diag(confmat))/sum(confmat))
+# }

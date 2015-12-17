@@ -15,14 +15,10 @@ test <- mnist[-samplerows,]
 
 
 labels  = mnist[,1]
-mnist28 = mnist[,-1]
 
-num_obs = dim(mnist28)[1]
 
 reducedf = function(df, g){
   # Inputs are data-frame and desired granularity
-  num_pix = dim(mnist28)[2]
-  
   # Flatten (horizontally)
   for(i in 1:(num_pix/g)){
     new_col = matrix(rep(0, num_obs), nrow = num_obs)
