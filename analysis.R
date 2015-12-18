@@ -108,7 +108,7 @@ indexVector <- c(indexVector, 1)
 
 svm.train <- train[,c(indexVector)]
 
-svm.cv <- svm(label ~ ., data = svm.train, cross = 10, gamma=2^(-10), cost =1) #left out rows with always 0
+svm.cv <- svm(label ~ ., data = svm.train, cross = 10, gamma=2^(-10), cost = 4) #left out rows with always 0
 svm.pred <- predict(svm.cv, test[,-1])
 svm.confmat <- table(test[,1], svm.pred)
 svm.accuracy <- vector(length = 10)
@@ -120,7 +120,7 @@ svm.predictionRate<-sum(diag(svm.confmat))/sum(svm.confmat)
 print(svm.accuracy)
 print(svm.predictionRate)
 
-#with tuning
-svm.tuning <- tune.svm(label ~ ., data = svm.train, cross = 10, gamma = 2^(-10:-6), cost = 2^(0:4))
+#Tuning
+svm.tuning <- tune.svm(label ~ ., data = svm.train, cross = 10,gamma=2^(-11:-8), cost = 2^(0:6))
 
 
